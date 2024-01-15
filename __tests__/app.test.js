@@ -3,6 +3,8 @@ const request = require("supertest");
 const db = require('../db/connection');
 const seed = require('../db/seeds/seed');
 const data = require('../db/data/test-data/index');
+const endPoints = require('../endpoints.json');
+
 
 
 beforeEach(() => seed(data));
@@ -31,5 +33,15 @@ describe('GET', () => {
         //         expect(response.body.msg).toBe('Not Found');
         //     })
         // })
+    })
+    describe('GET/api', () => {
+        test('GET: 200 Responds with An object describing all the available endpoints on your API', () => {
+            return request(app)
+            .get('/api')
+            .expect(200)
+            .then((response) => {
+                expect(response.body).toEqual(endPoints);
+            })
+        })
     })
 })
