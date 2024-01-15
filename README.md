@@ -1,3 +1,1 @@
-# Northcoders News API
-
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+Please after cloning this rope to you local computer, create the the environment variables (.env.test and .env.development) so that you can connect to the database locally.
