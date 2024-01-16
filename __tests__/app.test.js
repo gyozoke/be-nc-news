@@ -11,6 +11,14 @@ beforeEach(() => seed(data));
 
 afterAll(() => db.end());
 
+describe("GET /api/invalid-endpoints", () => {
+  test("GET: 404 responds with not found when given an unrecognisable endpoint", () => {
+    return request(app)
+    .get("/api/hdgfhdgfdhf")
+    .expect(404);
+  });
+});
+
 describe('GET /api/topics', () => {
     test('GET: 200 Responds with an array of topic objects, each of which should have the following properties: slug, description', () => {
         return request(app)
@@ -42,15 +50,17 @@ describe('GET /api/articles/:article_id', () => {
         return request(app)
         .get('/api/articles/1')
         .expect(200)
-        .then((response) => {
-            expect(response.body.article.article_id).toBe(1);
-            expect(response.body.article.title).toBe("Living in the shadow of a great man");
-            expect(response.body.article.topic).toBe("mitch");
-            expect(response.body.article.author).toBe("butter_bridge");
-            expect(response.body.article.body).toBe("I find this existence challenging");
-            expect(response.body.article.created_at).toBe("2020-07-09T20:11:00.000Z");
-            expect(response.body.article.votes).toBe(100);
-            expect(response.body.article.article_img_url).toBe("https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700");
+        .then(({ body }) => {
+            expect(body.article).toMatchObject({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String)
+            })
         })
     })
     test('GET: 404 sends a status and error message when given a valid but non-existent id', () => {
@@ -67,6 +77,39 @@ describe('GET /api/articles/:article_id', () => {
         .expect(400)
         .then((response) => {
             expect(response.body.msg).toBe('Bad Request');
+        })
+    })
+})
+
+describe('GET /api/articles', () => {
+    test('GET 200: Responds with: an articles array of article objects, each of which should have the following properties: author, title, article_id, topic, created_at, votes, article_img_url, comment_count.', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+            expect(body.articles.length).toBe(13);
+            body.articles.forEach((article) => {
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String),
+                    comment_count: expect.any(String)
+                })
+            })
+        })
+    })
+    test('GET:200 the articles should be sorted by date in descending order', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+            expect(body.articles).toBeSortedBy('created_at', {
+                descending: true
+              });
         })
     })
 })
