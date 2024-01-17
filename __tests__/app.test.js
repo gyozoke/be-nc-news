@@ -181,6 +181,7 @@ describe('GET /api/articles/:article_id/comments', () => {
       test("POST: 400 sends a status and error message when given an invalid article_id", () => {
         const newComment = {
             username: 'butter_bridge',
+            body: 'Awesome Article'
           };
         return request(app)
           .post('/api/articles/not_an_id/comments')
