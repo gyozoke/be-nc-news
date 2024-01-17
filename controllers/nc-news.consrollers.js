@@ -33,4 +33,16 @@ const getArticles = (req, res) => {
     })
 }
 
+
+const getCommentsByArticleID = (req, res, next) => {
+    const { article_id } = req.params;
+    fetchCommentsByArticleID(article_id)
+    .then((comments) => {
+        res.status(200).send({comments});
+    }).catch((err) => {
+        next(err);
+    })
+}
+console.log('hello');
+module.exports = { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleID };
 module.exports = { getTopics, getEndpoints, getArticleById, getArticles };
