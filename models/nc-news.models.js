@@ -44,19 +44,4 @@ const fetchArticles = () => {
     })
 }
 
-const fetchCommentsByArticleID = (article_id) => {
-    return db
-    .query(
-        `SELECT * 
-        FROM comments 
-        WHERE comments.article_id = $1;`, 
-        [article_id])
-        .then((result) => {
-            if (result.rows.length === 0) {
-                return Promise.reject(({ status: 404, msg: 'Article Does Not Exist' }))
-            }
-            return result.rows;
-        })
-}
-
-module.exports = { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles, fetchCommentsByArticleID };
+module.exports = { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles };
