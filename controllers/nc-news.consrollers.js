@@ -42,5 +42,5 @@ const getCommentsByArticleID = (req, res, next) => {
         next(err);
     })
 }
-
+console.log('hello');
 module.exports = { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleID };

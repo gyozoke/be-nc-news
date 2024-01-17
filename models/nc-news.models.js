@@ -58,5 +58,5 @@ const fetchCommentsByArticleID = (article_id) => {
             return result.rows;
         })
 }
-
+console.log('hello');
 module.exports = { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles, fetchCommentsByArticleID };

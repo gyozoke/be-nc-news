@@ -13,7 +13,7 @@ app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticleID);
-
+console.log('hello');
 app.use((err, req, res, next) => {
     if (err.status) {
       res.status(err.status).send({ msg: err.msg });
