@@ -1,4 +1,4 @@
-const { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles, fetchCommentsByArticleID } = require("../models/nc-news.models")
+const { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles } = require("../models/nc-news.models")
 
 
 const getTopics = (req, res, next) => {
@@ -24,7 +24,7 @@ const getArticleById = (req, res, next) => {
     })
 }
 
-const getArticles = (req, res, next) => {
+const getArticles = (req, res) => {
     fetchArticles()
     .then((articles) => {
         res.status(200).send({articles});
@@ -33,14 +33,4 @@ const getArticles = (req, res, next) => {
     })
 }
 
-const getCommentsByArticleID = (req, res, next) => {
-    const { article_id } = req.params;
-    fetchCommentsByArticleID(article_id)
-    .then((comments) => {
-        res.status(200).send({comments});
-    }).catch((err) => {
-        next(err);
-    })
-}
-
-module.exports = { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleID };
+module.exports = { getTopics, getEndpoints, getArticleById, getArticles };
