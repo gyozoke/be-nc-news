@@ -24,11 +24,13 @@ describe('GET /api/topics', () => {
         return request(app)
         .get('/api/topics')
         .expect(200)
-        .then((response) => {
-            expect(response.body.topics.length).toBe(3);
-            response.body.topics.forEach((topic) => {
-                expect(typeof topic.slug).toBe('string');
-                expect(typeof topic.description).toBe('string');
+        .then(({body}) => {
+            expect(body.topics.length).toBe(3);
+            body.topics.forEach((topic) => {
+                expect(topic).toMatchObject({
+                    slug: expect.any(String),
+                    description: expect.any(String)
+                })
             })
         })
     })
@@ -39,8 +41,8 @@ describe('GET /api', () => {
         return request(app)
         .get('/api')
         .expect(200)
-        .then((response) => {
-            expect(response.body).toEqual(endPoints);
+        .then(({body}) => {
+            expect(body).toEqual(endPoints);
         })
     })
 })
@@ -67,16 +69,16 @@ describe('GET /api/articles/:article_id', () => {
         return request(app)
         .get('/api/articles/987')
         .expect(404)
-        .then((response) => {
-            expect(response.body.msg).toBe('Article Does Not Exist');
+        .then(({body}) => {
+            expect(body.msg).toBe('Article Does Not Exist');
         })
     })
     test('GET: 400 sends a status and error message when given an invalid id', () => {
         return request(app)
         .get('/api/articles/not_an_article')
         .expect(400)
-        .then((response) => {
-            expect(response.body.msg).toBe('Bad Request');
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad Request');
         })
     })
 })
@@ -110,6 +112,43 @@ describe('GET /api/articles', () => {
             expect(body.articles).toBeSortedBy('created_at', {
                 descending: true
               });
+        })
+    })
+})
+
+describe('GET /api/articles/:article_id/comments', () => {
+    test('GET: 200 Responds with: an array of comments for the given article_id of which each comment should have the following properties: comment_id, votes, created_at, author, body, article_id', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({body}) => {
+            expect(body.comments.length).toBe(11)
+            body.comments.forEach((comment) => {
+                expect(comment).toMatchObject({
+                    comment_id: expect.any(Number),
+                    votes: expect.any(Number),
+                    created_at: expect.any(String),
+                    author: expect.any(String),
+                    body: expect.any(String),
+                    article_id: expect.any(Number)
+                })
+            })
+        })
+    })
+    test('GET: 404 sends a status and error message when given a valid but non-existent article_id', () => {
+        return request(app)
+        .get('/api/articles/987/comments')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe('Article Does Not Exist');
+        })
+    })
+    test('GET: 400 sends a status and error message when given an invalid article_id', () => {
+        return request(app)
+        .get('/api/articles/not_an_article/comments')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad Request');
         })
     })
 })
