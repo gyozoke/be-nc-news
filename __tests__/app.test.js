@@ -24,11 +24,13 @@ describe('GET /api/topics', () => {
         return request(app)
         .get('/api/topics')
         .expect(200)
-        .then((response) => {
-            expect(response.body.topics.length).toBe(3);
-            response.body.topics.forEach((topic) => {
-                expect(typeof topic.slug).toBe('string');
-                expect(typeof topic.description).toBe('string');
+        .then(({body}) => {
+            expect(body.topics.length).toBe(3);
+            body.topics.forEach((topic) => {
+                expect(topic).toMatchObject({
+                    slug: expect.any(String),
+                    description: expect.any(String)
+                })
             })
         })
     })
@@ -67,16 +69,16 @@ describe('GET /api/articles/:article_id', () => {
         return request(app)
         .get('/api/articles/987')
         .expect(404)
-        .then((response) => {
-            expect(response.body.msg).toBe('Article Does Not Exist');
+        .then(({body}) => {
+            expect(body.msg).toBe('Article Does Not Exist');
         })
     })
     test('GET: 400 sends a status and error message when given an invalid id', () => {
         return request(app)
         .get('/api/articles/not_an_article')
         .expect(400)
-        .then((response) => {
-            expect(response.body.msg).toBe('Bad Request');
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad Request');
         })
     })
 })
@@ -128,7 +130,7 @@ describe('GET /api/articles/:article_id/comments', () => {
                     created_at: expect.any(String),
                     author: expect.any(String),
                     body: expect.any(String),
-                    article_id: expect.any(Number)
+                    article_id: 1
                 })
             })
         })
@@ -149,7 +151,58 @@ describe('GET /api/articles/:article_id/comments', () => {
             expect(body.msg).toBe('Bad Request');
         })
     })
-})
-console.log('hello');
+    test('POST: 201 inserts a new comment to the db', () => {
+        const newComment = {
+            username: 'butter_bridge',
+            body: 'Awesome Article'
+          };
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({body}) => {
+              expect(body.comment.comment_id).toBe(19);
+              expect(body.comment.author).toBe("butter_bridge");
+              expect(body.comment.body).toBe('Awesome Article');
+        });
+    })
+    test("POST: 400 sends status and error message when provided with wrong body (or no body)", () => {
+        const newComment = {
+            username: 'butter_bridge',
+          };
+        return request(app)
+          .post('/api/articles/1/comments')
+          .send(newComment)
+          .expect(400)
+          .then((response) => {
+            expect(response.body.msg).toBe("Bad Request");
+          });
+      });
+      test("POST: 400 sends a status and error message when given an invalid article_id", () => {
+        const newComment = {
+            username: 'butter_bridge',
+            body: 'Awesome Article'
+          };
+        return request(app)
+          .post('/api/articles/not_an_id/comments')
+          .send(newComment)
+          .expect(400)
+          .then((response) => {
+            expect(response.body.msg).toBe("Bad Request");
+          });
+      });
+      test("POST: 500 sends a status and error message when given a valid but non existing article id", () => {
+        const newComment = {
+            username: 'butter_bridge',
+            body: 'Awesome Article'
+          };
+        return request(app)
+          .post('/api/articles/998/comments')
+          .send(newComment)
+          .expect(500)
+          .then((response) => {
+            expect(response.body.msg).toBe('Internal Server Error');
+          });
+      });
 })
 

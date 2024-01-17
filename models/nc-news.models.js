@@ -53,10 +53,22 @@ const fetchCommentsByArticleID = (article_id) => {
         [article_id])
         .then((result) => {
             if (result.rows.length === 0) {
-                return Promise.reject(({ status: 404, msg: 'Article Does Not Exist' }))
+                return Promise.reject({ status: 404, msg: 'Article Does Not Exist' })
             }
             return result.rows;
         })
 }
-console.log('hello');
-module.exports = { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles, fetchCommentsByArticleID };
+
+const insertComment = ({ username, body }, article_id) => {
+    return db.query(`
+    INSERT INTO 
+    comments (author, body, article_id) 
+    VALUES ($1, $2, $3) 
+    RETURNING *;`, 
+    [username, body, article_id])
+    .then((result) => {
+        return result.rows[0];
+    })
+}
+
+module.exports = { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles, fetchCommentsByArticleID, insertComment };
