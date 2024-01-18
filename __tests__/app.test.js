@@ -262,8 +262,32 @@ describe('PATCH /api/articles/:article_id', () => {
           .patch('/api/articles/1')
           .send(newVote)
           .expect(400)
-          .then((response) => {
-            expect(response.body.msg).toBe("Bad Request");
+          .then(({body}) => {
+            expect(body.msg).toBe("Bad Request");
           });
       });
+})
+
+describe('DELETE /api/comments/:comment_id', () => {
+    test('DELETE: 204 responds with no content', () => {
+        return request(app)
+        .delete('/api/comments/2')
+        .expect(204)
+    })
+    test('DELETE: 404 responds with status code and error message when given a valid but non existing id', () => {
+        return request(app)
+        .delete('/api/comments/222')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe('Comment Does Not Exist')
+        })
+    })
+    test('DELETE: 400 responds with status and error message when given an invalid comment id', () => {
+        return request(app)
+        .delete('/api/comments/not_an_id')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad Request');
+        })
+    })
 })
