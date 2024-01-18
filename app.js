@@ -1,6 +1,5 @@
 const express = require("express");
-const { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleID, postComment } = require("./controllers/nc-news.consrollers");
-
+const { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleID, postComment, patchVoteAtArticleId } = require("./controllers/nc-news.consrollers");
 const app = express();
 app.use(express.json());
 
@@ -15,6 +14,9 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleID);
 
 app.post("/api/articles/:article_id/comments", postComment);
+
+app.patch("/api/articles/:article_id", patchVoteAtArticleId);
+
 
 app.use((err, req, res, next) => {
     if (err.status) {
@@ -32,7 +34,6 @@ app.use((err, req, res, next) => {
     if (err.code === "23503")
     res.status(500).send({ msg: 'Internal Server Error' });
   });
-
 
 
 module.exports = app;

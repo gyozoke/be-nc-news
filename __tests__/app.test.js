@@ -6,7 +6,6 @@ const data = require('../db/data/test-data/index');
 const endPoints = require('../endpoints.json');
 
 
-
 beforeEach(() => seed(data));
 
 afterAll(() => db.end());
@@ -151,6 +150,9 @@ describe('GET /api/articles/:article_id/comments', () => {
             expect(body.msg).toBe('Bad Request');
         })
     })
+})
+
+describe('POST /api/articles/:article_id/comments', () => {
     test('POST: 201 inserts a new comment to the db', () => {
         const newComment = {
             username: 'butter_bridge',
@@ -174,8 +176,8 @@ describe('GET /api/articles/:article_id/comments', () => {
           .post('/api/articles/1/comments')
           .send(newComment)
           .expect(400)
-          .then((response) => {
-            expect(response.body.msg).toBe("Bad Request");
+          .then(({body}) => {
+            expect(body.msg).toBe("Bad Request");
           });
       });
       test("POST: 400 sends a status and error message when given an invalid article_id", () => {
@@ -187,8 +189,8 @@ describe('GET /api/articles/:article_id/comments', () => {
           .post('/api/articles/not_an_id/comments')
           .send(newComment)
           .expect(400)
-          .then((response) => {
-            expect(response.body.msg).toBe("Bad Request");
+          .then(({body}) => {
+            expect(body.msg).toBe("Bad Request");
           });
       });
       test("POST: 500 sends a status and error message when given a valid but non existing article id", () => {
@@ -197,12 +199,71 @@ describe('GET /api/articles/:article_id/comments', () => {
             body: 'Awesome Article'
           };
         return request(app)
-          .post('/api/articles/998/comments')
+          .post('/api/articles/887/comments')
           .send(newComment)
           .expect(500)
+          .then(({body}) => {
+            expect(body.msg).toBe('Internal Server Error');
+          });
+     });
+})
+
+describe('PATCH /api/articles/:article_id', () => {
+    test('PATCH: 200 responds with the updated article', () => {
+        const newVote = {
+            inc_votes: 200
+        }
+        return request(app)
+        .patch('/api/articles/1')
+        .send(newVote)
+        .expect(200)
+        .then(({body}) => {
+            expect(body.updatedArticle).toMatchObject({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: 300,
+                article_img_url: expect.any(String)
+            })
+        })
+    })
+     test('PATCH: 404 sends a status and error message when given a valid but non-existent id', () => {
+         const newVote = {
+            inc_votes: 200
+        }
+        return request(app)
+        .patch('/api/articles/987')
+        .send(newVote)
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe('Article Does Not Exist');
+        })
+    })
+    test('PATCH: 400 sends a status and error message when given an invalid id', () => {
+        const newVote = {
+            inc_votes: 200
+        }
+        return request(app)
+        .patch('/api/articles/not_an_article')
+        .send(newVote)
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad Request');
+        })
+    })
+    test("PATCH: 400 sends status and error message when provided with wrong vote (or no vote)", () => {
+        const newVote = {
+            inc_votes: "vote"
+        }
+        return request(app)
+          .patch('/api/articles/1')
+          .send(newVote)
+          .expect(400)
           .then((response) => {
-            expect(response.body.msg).toBe('Internal Server Error');
+            expect(response.body.msg).toBe("Bad Request");
           });
       });
 })
-

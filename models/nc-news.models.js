@@ -66,9 +66,24 @@ const insertComment = ({ username, body }, article_id) => {
     VALUES ($1, $2, $3) 
     RETURNING *;`, 
     [username, body, article_id])
-    .then((result) => {
+    .then((result) => {  
         return result.rows[0];
     })
 }
 
-module.exports = { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles, fetchCommentsByArticleID, insertComment };
+const updateVoteAtArtcileId = (article_id, newVotes) => {
+    return db.query(`
+    UPDATE articles 
+    SET votes = votes + $1 
+    WHERE article_id = $2 
+    RETURNING *;`, 
+    [newVotes, article_id])
+    .then((result) => {
+        if (result.rows.length === 0) {
+            return Promise.reject({ status: 404, msg: "Article Does Not Exist" });
+        }
+        return result.rows[0]
+    })
+}
+
+module.exports = { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles, fetchCommentsByArticleID, insertComment, updateVoteAtArtcileId };
