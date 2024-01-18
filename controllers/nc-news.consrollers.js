@@ -1,4 +1,4 @@
-const { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles, fetchCommentsByArticleID, insertComment, updateVoteAtArtcileId, removeCommentById } = require("../models/nc-news.models")
+const { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles, fetchCommentsByArticleID, insertComment, updateVoteAtArtcileId, removeCommentById, fetchUsers } = require("../models/nc-news.models")
 
 const getTopics = (req, res, next) => {
     fetchTopics().then((topics) => {
@@ -76,4 +76,11 @@ const deleteCommentById = (req, res, next) => {
     })
 }
 
-module.exports = { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleID, postComment, patchVoteAtArticleId, deleteCommentById };
+const getUsers = (req, res, next) => {
+    fetchUsers()
+    .then((users) => {
+        res.status(200).send({users});
+    })
+}
+
+module.exports = { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleID, postComment, patchVoteAtArticleId, deleteCommentById, getUsers };

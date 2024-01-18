@@ -101,8 +101,13 @@ const removeCommentById = (comment_id) => {
             `, [comment_id]);
         }
     })
-
-    
 }
 
-module.exports = { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles, fetchCommentsByArticleID, insertComment, updateVoteAtArtcileId, removeCommentById };
+const fetchUsers = () => {
+    return db.query("SELECT * FROM users")
+    .then((result) => {
+        return result.rows;
+    })
+}
+
+module.exports = { fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles, fetchCommentsByArticleID, insertComment, updateVoteAtArtcileId, removeCommentById, fetchUsers };
