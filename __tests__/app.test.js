@@ -180,6 +180,18 @@ describe('POST /api/articles/:article_id/comments', () => {
             expect(body.msg).toBe("Bad Request");
           });
       });
+      test("POST: 400 sends status and error message when provided with wrong username (or no username)", () => {
+        const newComment = {
+            body: 'Awesome Article'
+          };
+        return request(app)
+          .post('/api/articles/1/comments')
+          .send(newComment)
+          .expect(400)
+          .then(({body}) => {
+            expect(body.msg).toBe("Bad Request");
+          });
+      });
       test("POST: 400 sends a status and error message when given an invalid article_id", () => {
         const newComment = {
             username: 'butter_bridge',
@@ -193,7 +205,7 @@ describe('POST /api/articles/:article_id/comments', () => {
             expect(body.msg).toBe("Bad Request");
           });
       });
-      test("POST: 500 sends a status and error message when given a valid but non existing article id", () => {
+      test("POST: 404 sends a status and error message when given a valid but non existing article id", () => {
         const newComment = {
             username: 'butter_bridge',
             body: 'Awesome Article'
@@ -201,9 +213,9 @@ describe('POST /api/articles/:article_id/comments', () => {
         return request(app)
           .post('/api/articles/887/comments')
           .send(newComment)
-          .expect(500)
+          .expect(404)
           .then(({body}) => {
-            expect(body.msg).toBe('Internal Server Error');
+            expect(body.msg).toBe('Article Does Not Exist');
           });
      });
 })
