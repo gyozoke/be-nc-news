@@ -88,6 +88,54 @@ describe('GET /api/articles', () => {
               });
         })
     })
+    test('GET: 200 should also accept the following query: topic(mitch), which filters the articles by the topic value specified in the query.', () => {
+        return request(app)
+        .get('/api/articles?topic=mitch')
+        .expect(200)
+        .then(({body}) => {
+            expect(body.articles.length).toBe(12);
+            body.articles.forEach((article) => {
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: 'mitch',
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String),
+                    comment_count: expect.any(String)
+                })
+            })
+        })
+    })
+    test('GET: 200 should also accept the following query: topic(cats), which filters the articles by the topic value specified in the query. If the query is omitted, the endpoint should respond with all articles', () => {
+        return request(app)
+        .get('/api/articles?topic=cats')
+        .expect(200)
+        .then(({body}) => {
+            expect(body.articles.length).toBe(1);
+            body.articles.forEach((article) => {
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: 'cats',
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String),
+                    comment_count: expect.any(String)
+                })
+            })
+        })
+    })
+    test('GET: 404 responds with a status and a message when given an invalid (non existing) query', () => {
+        return request(app)
+        .get('/api/articles?topic=not_a_topic')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe('Query Does Not Exist')
+        })
+    })
 })
 
 describe("GET /api/invalid-endpoints", () => {
@@ -343,3 +391,5 @@ describe('DELETE /api/comments/:comment_id', () => {
         })
     })
 })
+
+
