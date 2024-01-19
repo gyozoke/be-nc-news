@@ -22,24 +22,38 @@ const fetchArticleById = (article_id) => {
     })
 }
 
-const fetchArticles = () => {
-    return db.query(
-        `SELECT
-        articles.author,
-        articles.title,
-        articles.article_id,
-        articles.topic,
-        articles.created_at,
-        articles.votes,
-        articles.article_img_url, 
-        COUNT(comments.article_id) 
-        AS comment_count 
-        FROM articles 
-        LEFT JOIN comments 
-        ON comments.article_id = articles.article_id 
-        GROUP BY articles.article_id 
-        ORDER BY created_at DESC`)
+const fetchArticles = (topic) => {
+    let queryStr = `
+    SELECT
+    articles.author,
+    articles.title,
+    articles.article_id,
+    articles.topic,
+    articles.created_at,
+    articles.votes,
+    articles.article_img_url, 
+    COUNT(comments.article_id) 
+    AS comment_count 
+    FROM articles 
+    LEFT JOIN comments 
+    ON comments.article_id = articles.article_id`;
+
+    const params = [];
+
+    if (topic) {
+        queryStr += ` WHERE articles.topic = $1`;
+        params.push(topic);
+    }
+
+    queryStr += ` 
+    GROUP BY articles.article_id 
+    ORDER BY created_at DESC;`;
+
+    return db.query(queryStr, params)
     .then((result) => {
+        if (result.rows.length === 0) {
+            return Promise.reject({status: 404, msg: 'Query Does Not Exist'});
+        }
         return result.rows;
     })
 }
@@ -88,17 +102,13 @@ const updateVoteAtArtcileId = (article_id, newVotes) => {
 
 const removeCommentById = (comment_id) => {
     return db.query(`
-    SELECT * 
-    FROM comments 
-    WHERE comment_id = $1
-    `, [comment_id]).then((result) => {
+    DELETE FROM comments 
+    WHERE comment_id = $1 
+    RETURNING *;
+    `, [comment_id])
+    .then((result) => {
         if (result.rows.length === 0) {
             return Promise.reject({ status: 404, msg: 'Comment Does Not Exist'})
-        } else {
-            return db.query(`
-            DELETE from comments 
-            WHERE comment_id = $1;
-            `, [comment_id]);
         }
     })
 }

@@ -1,5 +1,6 @@
 const express = require("express");
 const { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleID, postComment, patchVoteAtArticleId, deleteCommentById, getUsers } = require("./controllers/nc-news.consrollers");
+
 const app = express();
 app.use(express.json());
 
