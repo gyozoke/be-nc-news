@@ -164,6 +164,24 @@ describe('GET /api/articles/:article_id', () => {
             })
         })
     })
+    test('GET: 200 Responds with an article object, where we now have a new property comment_count added as well', () => {
+        return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then(({ body }) => {
+            expect(body.article).toMatchObject({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String)
+            })
+        })
+    })
     test('GET: 404 sends a status and error message when given a valid but non-existent id', () => {
         return request(app)
         .get('/api/articles/987')
