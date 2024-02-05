@@ -2,9 +2,9 @@ const cors = require('cors');
 const express = require("express");
 const { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleID, postComment, patchVoteAtArticleId, deleteCommentById, getUsers } = require("./controllers/nc-news.consrollers");
 
-app.use(cors());
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.get("/api/topics", getTopics);
 
