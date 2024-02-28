@@ -27,3 +27,6 @@ for security purposes the PGDATABASE links have been created in multiple .env fi
 the node version required for the project: "^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0"
 
 pg version required: "^8.7.3"
+
+Link to the API hosted on Render:
+https://nc-news-by-victor.onrender.com/api
